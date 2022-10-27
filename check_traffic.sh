@@ -4,8 +4,8 @@
 # File:         check_traffic.sh
 # Description:  Nagios check plugins to check network interface traffic with SNMP run in *nix.
 # Language:     GNU Bourne-Again SHell
-# Version:	1.4.0
-# Date:		2013-11-05
+# Version:	1.4.1
+# Date:		2022-02-03
 # Corp.:	Chenlei
 # Author:	cloved@gmail.com, chnl@163.com (U can msn me with this), QQ 31017671
 # WWW:		http://www.itnms.info
@@ -24,228 +24,22 @@
 #########################################################################
 # ChangeLog:
 #
+# Version 1.4.3
+# 2022-08-08
+# delete tmp file when unknown for clean retry.
+#
+# Version 1.4.2
+# 2022-02-08
+# Retry once when negative result
+#
+# Version 1.4.1
+# 2022-02-03
+# Case insensitive search for first occurence of pattern, cut index
+#
 # Version 1.4.0
 # 2013-11-05
 # Fix bug for Conter64 check.
 #
-# Version 1.3.11
-# 2013-10-09
-# Add -Oa option to all snmplwak/snmpget command.
-#
-# Version 1.3.10
-# 2013-01-29
-# Set the Default TIMEOUT. Thanks to martin.leeyd.
-#
-# Version 1.3.9
-# 2012-12-05
-# Use 'id --user --name' instead of '$USER' 
-#
-# Version 1.3.8
-# 2012-09-28
-# Add -Oa option to snmplwak command with List Interface function.
-#
-# Version 1.3.7
-# 2012-09-25
-# Fix spelling mkstakes of help msgs.
-#
-# Version 1.3.6
-# 2012-09-25
-# Fix bug of Conversion K to M. With bps use 1000, with B/s use 1024;
-#
-# Version 1.3.5
-# 2012-09-04
-# Give out more suitable help messages when can not get the interface index. Thanks to Jack.
-#
-# Version 1.3.4
-# 2012-08-17
-# Fix some spelling mistake. Thanks, Jack.
-#
-# Version 1.3.3
-# 2012-08-16
-# 1)Fix some spelling mistake;
-# 2)Add support with multi hosts and multi interfaces checks.
-#
-# Version 1.3.2
-# 2012-08-15
-# Add -N args support with multi interface checks
-#
-# Version 1.3.1
-# 2012-08-13
-# Fix history data time update bug.
-#
-# Version 1.3.0
-# 2012-08-10
-# Add support with the -N args, with interface name when to check the single interface.
-#
-# Version 1.2.12
-# 2012-05-20
-# Fix bugs for message output.
-#
-# Version 1.2.11
-# 2012-05-20
-# Use snmpget instead of snmpwalk for reducing CPU footprint.
-#
-# Version 1.2.10
-# 2012-05-12
-# 1)bug fix for debug log
-# 2)add "J" to suffix when Jitter option was set
-# 3)add "R" to suffix when Range option was set
-# 4)some tips in help messages fix
-#
-# Version 1.2.9
-# 2012-05-10
-# Fix bugs of the Same host Multi interfaces traffic aggregating and jitter calculating. 
-#
-# Version 1.2.8
-# 2012-04-26
-# 1) Add the support for multi interfaces checking (in the same host/device) and traffic aggregation.
-#     Example: -I 2,3 or -I 10,12,16,18
-# 2) Add the default suffix "itnms" 
-# 3) Check bc command
-#
-# Version 1.2.7
-# 2012-04-05
-# 1) Add "exit $Severity" at line 927. fix bug for Jitter exit value. Thanks gouldchu.
-# 2) U can use "-F s/S" to control the format and get less output.
-#
-# Version 1.2.6
-# 2011-12-13
-# Spelling fix, from itnms.net to itnms.info.
-#
-# Version 1.2.5
-# 2011-10-18
-# Spelling fix.
-#
-# Version 1.2.4
-# 2011-10-12
-# Add snmp v3 support.
-#
-# Version 1.2.3
-# 2011-09-05
-# Fix bugs when high traffic occurs -- ifSpeed check error
-#
-# Version 1.2.2
-# 2011-03-11
-# Fix bugs with overflow detection. Thanks for jans1086.
-#
-# Version 1.2.1
-# 2010-11-19
-# Fix some spelling mistake;
-#
-# Version 1.2.0
-# 2010-04-26
-# Change default Scale value from 4 to 2, for more friendly output. If you want more excat value, U can change it for youself.
-# Fix the Min Interval check bugs, move the check before write the current data to data hist file.
-# Add the Max Interval var, default value is 1800, if the hist data file is too old, drop the result.
-# Fix the for output "Maybe 32 bit counter overflow, because we got a negative value here." when check too frequent. And set Min_Interval to 30 as default.
-# Add the -F option for simple or more simple(s/S) output format.
-# Add the -i option for the individual suffix with the CF/STAT_HIST_DATA if necessary.
-# Use the 64bit counter as default, when snmp version is v2c. If the system not support it, use 32bit counter instead.
-# Get the interface's IF-MIB::ifSpeed, if the traffic value is bigger than it, drop it and output with OOPS and exit with Unkown.
-# Modify the CF_HIST_DATA file name  from "/var/tmp/check_traffic_${Host}_${Interface}.hist_dat" to 
-#       "/var/tmp/check_traffic_${Host}_${Interface}.hist_dat_${USER}_64|32" for resolving 
-#	1)user and 
-#	2)64/32bit 
-#	transfer problem which make 
-#	1)the hist data file read/write error and
-#       2)with huge error traffic value.
-# Add the function for testing Traffic Jitter(The orginal idea come from msn chat wiht wjks@hotmail.com). 
-#	Add a option -p N, N(suggest values is from 4 to 12) is a number that we comare this time value with the average value of previos N times 
-#	we had been checked. 
-#	If the value we checked this time is not in our defined scope(a % value) with -w/-c option specified(such as -w 20,20 -c30,30 ), 
-#	we think that it is a traffic jitter.
-#	For this option, add a file for storing the hist data to stat: /var/tmp/check_traffic_${Host}_${Interface}.hist_dat_${USER}_64|32_ctj_$Num"
-#
-# Version 1.1.6
-# 2009-02-20
-# Fix some mistake at perfdata output format with Warning and Critical Value. (thanks for Jiang Shan)
-# Remove the redundant code, merge code for --range option. 
-# Write data before the exit(for the reason of IsFirst), for the next time use.
-# When write or read file error, use Unknow instead of Warning severity.
-# If get a negative netflow or time interval value here, exit with unknow.
-#
-# Version 1.1.5
-# 2008-09-28
-# Fix bug on perfdata output format;
-# Fix some spelling mistake;
-# Add the Default Value for UseRange as "False";
-#
-# Version 1.1.4
-# 2008-09-18
-# Add -r  options, Use Range instead of single value in warning and critical Threshold;
-# This option suggestion by zhgypg@hotmail.com at http://www.itnms.info/thread-1220-1-1.html
-#
-# Version 1.1.3
-# 2008-09-17
-# Set the default Interval as 12 seconds;
-#
-# Version 1.1.2
-# 2008-08-19
-# Check the snmp agent support the 64 bit counter or not;
-# Check the interface status, if not OK, exit with Critical status;
-# Get the interface name with Interface Index Value;
-#
-# Version 1.1.1
-# 2008-08-06
-# Fix some bugs in version compare.
-# Use -6 option, use 64 bit counter.
-#
-# Version 1.1.0
-# 2008-06-11
-# In snmp v2c, use counters ifHC*  instead of if*;
-#
-# Version 1.0.9
-# 2008-04-22
-# More friendly output when getting snmp info error.
-#
-# Version 1.0.8
-# 2008-03-31
-# Correct some spelling mistake
-#
-# Version 1.0.7
-# 2008-03-28
-# If it's the first time to touch hist_dat, echo OK and Tips out;
-# Test the hist_dat can be read and write;
-# Use the Vars for $OutPut and $PerfData
-# Fix some output format.
-#
-# Version 1.0.6
-# 2008-03-25
-# Correct Performance data output with Warning and Critical Value of Total and Interval for pnp graphing.
-#
-# Version 1.0.5
-# 2008-03-24
-# Correct Performance data output for pnp graphing.
-#
-# Version 1.0.4
-# 2008-03-21
-# Correct Performance data output to "Nagios plug-in development guidelines", 
-# for Graphing the performance data in the web with PNP.
-# The standard is: 'label'=value[UOM];[warn];[crit];[min];[max]
-#
-# Version 1.0.3
-# 2008-03-20
-# More friendly output with function list_interface().
-#
-# Version 1.0.2
-# 2008-03-06
-# Fix some coding bugs;
-# Add the -L support;
-# -K/-M to speicify in K or M (bps,B/s);
-# -B/-b switch to B/s or bps;
-# Add Total traffic value in output
-#
-# Version 1.0.1
-# 2008-02-28
-# Fix two cacl bugs at line 212 and 244.
-# In print_full_help_msg(), '$$' instead $$.
-#
-# Version 1.0
-# 2008-02-27
-# Original Version.
-#########################################################################
-# Heh, just a ad here :), for my honey.
-# http://shop35165045.taobao.com/
 ############################
 #
 # Exit values:
@@ -308,7 +102,9 @@ unset LANG
 
 Scale=2
 Unit_1="K"
-Unit_2="bps"
+#IcingaWeb only accepts units with lenght of 1 or 2
+#Unit_2="bps"
+Unit_2="b"
 
 UseRange="False"	
 
@@ -318,10 +114,14 @@ ifOut32="ifOutOctets"
 ifIn64="ifHCInOctets"
 ifOut64="ifHCOutOctets"
 # Set the Min Interval of Check.
-Min_Interval=30
+#Set Min_Interval to 5
+#Min_Interval=30
+Min_Interval=5
 Max_Interval=1800
 # Set the Default TIMEOUT. 
-Timeout=15
+#Set Timeout 60
+#Timeout=15
+Timeout=60
 
 print_help_msg(){
 	print_version
@@ -339,56 +139,7 @@ print_full_help_msg(){
 	$Echo "$0 [ -v ] [ -6 ] [ -i Suffix ] [ -F s|S ] [-p N] [ -r ] -V 1|2c|3 ( -C snmp-community | -A \"AuthString\" (when use snmp v3, U must give the AuthString)) -H host [ -L ] (-I interface|-N interface name) -w in,out-warning-value  -c in,out-critical-value -K/M -B/b "
 
 	$Echo "Example:"
-	$Echo "${0} -V 2c -C public -H 127.0.0.1 -I 4 -w 200,100 -c 300,200 -K -B"
-	$Echo "Or"
-	$Echo "${0} -V 2c -C public -H 127.0.0.1 -N FastEthernet0/1 -w 200,100 -c 300,200 -K -B"
-	$Echo "Or -r to use Range Value Options:"
-	$Echo "${0} -V 2c -C public -H 127.0.0.1 -I 4 -r -w 200-300,100-200 -c 100-400,50-250 -K -B"
-	$Echo "Or"
-	$Echo "${0} -V 2c -C public -H 127.0.0.1 -N eth0 -r -w 200-300,100-200 -c 100-400,50-250 -K -B"
-	$Echo "Or -p N to use Traffic Jitter Options:"
-	$Echo "${0} -V 2c -C public -H 127.0.0.1 -I 4 -p 8 -w 45,45 -c 55,55"
-	$Echo "Or"
-	$Echo "${0} -V 2c -C public -H 127.0.0.1 -N eth0 -p 8 -w 45,45 -c 55,55"
-	$Echo 
-	$Echo "Or for single host and multi interfaces checking (in the same host/device) and traffic aggregation:"
-	$Echo "${0} -V 2c -C public -H 127.0.0.1 -I 2,3,8,9 -w 200,100 -c 300,200 -K -B"
-	$Echo "${0} -V 2c -C public -H 127.0.0.1 -N FastEthernet0/1,FastEthernet0/2 -w 200,100 -c 300,200 -K -B"
-	$Echo "Or -r to use Range Value Options:"
-	$Echo "${0} -V 2c -C public -H 127.0.0.1 -I 2,3,8,9 -r -w 200-300,100-200 -c 100-400,50-250 -K -B"
-	$Echo "${0} -V 2c -C public -H 127.0.0.1 -I -N FastEthernet0/1,FastEthernet0/2 -r -w 200-300,100-200 -c 100-400,50-250 -K -B"
-	$Echo "Or -p N to use Traffic Jitter Options:"
-	$Echo "${0} -V 2c -C public -H 127.0.0.1 -I 2,3,8,9 -p 8 -w 45,45 -c 55,55"
-	$Echo "${0} -V 2c -C public -H 127.0.0.1 -N FastEthernet0/1,FastEthernet0/2 -p 8 -w 45,45 -c 55,55"
-	$Echo 
-	$Echo "Or for multi hosts and mult interfaces checking (in the multi hosts/devices) and traffic aggregation:"
-	$Echo "${0} -V 2c,1 -C public,private -H 127.0.0.1,10.76.2.15,10.7.4.18 -I 2,2,1 -w 200,100 -c 300,200 -K -B"
-	$Echo "${0} -V 2c,1 -C public,private -H 127.0.0.1,10.76.2.15,10.7.4.18 -N FastEthernet0/20,FastEthernet0/2,eth0 -w200,100 -c300,200 -KB"
-	$Echo "Or -r to use Range Value Options:"
-	$Echo "${0} -V 2c,1 -C public,private -H 127.0.0.1,192.168.1.1 -I 2,3 -w 200-300,100-200 -c 100-400,50-250 -K -B"
-	$Echo "${0} -V 2c,1 -C public,private -H 127.0.0.1,192.168.1.1 -N FastEthernet0/8,FastEthernet0/2 -r -w 200-300,100-200 -c 100-400,50-250 -K -B"
-	$Echo "Or -p N to use Traffic Jitter Options:"
-	$Echo "${0} -V 2c,1 -C public,private -H 127.0.0.1,192.168.1.1 -I 2,3 -p 8 -w 45,45 -c 55,55"
-	$Echo "${0} -V 2c,1 -C public,private -H 127.0.0.1,192.168.1.1 -N FastEthernet0/21,FastEthernet0/24 -p 8 -w 45,45 -c 55,55"
-	$Echo 
-	$Echo "If you do not use -K/M -B/b options, default -K -b, corresponding to Kbps."
-	$Echo "Make sure that the check interval greater than 30 Seconds."
-	$Echo "Or modify the Min_Interval default value as you need "
-	$Echo 'And, if you want in Verbose mode, use -v, to check the debug messages in the file /tmp/check_traffic.$$.'
-	$Echo 
-	$Echo "Or use $0 [ -v ] -V 1|2c|3 -C snmp-community -H host -L "
-	$Echo "To list all interfaces on the host."
-	$Echo 
-	$Echo "Or check for snmp v3 device:"
-	$Echo "${0} -V 3 -A \"-u kschmidt -l authPriv -a MD5 -A mysecretpass -x DES -X mypassphrase\" -H 127.0.0.1 -I 4 -w 200,100 -c 300,200 -K -B"
-	$Echo "Or"
-	$Echo "${0} -V 3 -A \"-u kschmidt -l authPriv -a MD5 -A mysecretpass -x DES -X mypassphrase\" -H 127.0.0.1 -N eth0 -w 200,100 -c 300,200 -K -B"
-	$Echo 
-	$Echo 
-	$Echo 'Report bugs to: cloved@gmail.com'
-	$Echo 'Home page: <http://bbs.itnms.info/forum.php?mod=viewthread&tid=767&extra=page%3D1>'
-	$Echo 'Geting help: <http://bbs.itnms.info/forum.php?mod=forumdisplay&fid=10&page=1> or Email to: cloved@gmail.com'
-
+	$Echo "${0} -V 2c -C public -H 127.0.0.1 -N FastEthernet0/1,FastEthernet0/2 -w 45,45 -c 55,55"
 }
 
 print_version(){
@@ -411,14 +162,17 @@ list_interface(){
 }
 
 get_interface_index(){
-	intNames="$1"
-	intIndex=""
-	intNameList=$(echo $intNames|sed 's/,/ /g')
-	for intName in $intNameList
-	do
-		intIndex="$intIndex "$($SNMPWALK -v $Version $Community $Host "IF-MIB::ifDescr" |awk -F 'STRING: ' '{if ($2 == "'$intName'")print $0}' | awk -F '=' '{print $1}' | sed 's/IF-MIB::ifDescr.//')
-	done
+        intNames="$1"
+        intIndex=""
+        intNameList=$(echo $intNames|sed 's/,/ /g')
+        for intName in $intNameList
+        do
+#Case insensitive search for first occurence of pattern, cut index
+#               intIndex="$intIndex "$($SNMPWALK -v $Version $Community $Host "IF-MIB::ifDescr" |awk -F 'STRING: ' '{if ($2 == "'$intNameTemp'")print $0}' | awk -F '=' '{print $1}' | sed 's/IF-MIB::ifDescr.//')
+                intIndex="$intIndex "$($SNMPWALK -v $Version $Community $Host "IF-MIB::ifDescr" | grep -m 1 -iF $intName | cut -d "." -f 2 | cut -d "=" -f 1)
+        done
 }
+
 
 gen_string(){
 	string_num=$1
@@ -556,7 +310,7 @@ fi
 SNMPWALK=`which snmpwalk 2>&1`
 if [ $? -ne 0 ];then
 	$Echo $SNMPWALK
-	$Echo "Can not found command snmpwalk in you system PATH: $PATH, pleas check it"
+	$Echo "Can not find command snmpwalk in you system PATH: $PATH, pleas check it"
 	exit 3
 fi
 SNMPWALK="$SNMPWALK -t $Timeout -Oa"
@@ -565,7 +319,7 @@ to_debug Use $SNMPWALK to check traffic
 SNMPGET=`which snmpget 2>&1`
 if [ $? -ne 0 ];then
 	$Echo $SNMPGET
-	$Echo "Can not found command snmpget in you system PATH: $PATH, pleas check it"
+	$Echo "Can not find command snmpget in you system PATH: $PATH, pleas check it"
 	exit 3
 fi
 SNMPGET="$SNMPGET -t $Timeout -Oa"
@@ -575,7 +329,7 @@ to_debug Use $SNMPGET to check traffic
 BC=`which bc 2>&1`
 if [ $? -ne 0 ];then
 	$Echo $BC
-	$Echo "Can not found command bc in you system PATH: $PATH, pleas check it"
+	$Echo "Can not find command bc in you system PATH: $PATH, pleas check it"
 	exit 3
 fi
 to_debug Use $BC to calculate
@@ -957,10 +711,11 @@ if [ $mmHostCnt -gt 1 ]; then
 				to_debug "$Time|$In|$Out"  $CF_HIST_DATA
 				continue
 			else
+				# Delete File for clean retry
+				rm $CF_HIST_DATA
 				Severity="3"
 				Msg="Unknown"
-				OutPut="Can not found data in the history data file. \
-				Please to check the file $CF_HIST_DATA, or use use verbose mode and check the debug file" 
+				OutPut="Can not find data in the history data file. The file $CF_HIST_DATA was deleted for a clean retry." 
 				$Echo "$Msg" "-" $OutPut
 				exit $Severity
 			fi
@@ -996,12 +751,24 @@ if [ $mmHostCnt -gt 1 ]; then
 		to_debug Interval/DiffIn/DiffOut $Interval $DiffIn $DiffOut 
 		
 		if [ ` echo " $Interval > 0 " |bc ` -eq 0 ] ; then
-			$Echo  "we got a negative time interval value here."
-			exit 3
+                        #Retry
+                        sleep 15
+                        /usr/lib/icinga2/custom_plugins/check_traffic.sh "$@"
+                        if [ $? -eq 0 ]; then
+			exit 0
+			fi
+			$Echo  "we got a negative time interval value here. Return "$?"."
+                        exit 3
 		fi
 		
 		if [ ` echo " $DiffOut >= 0 " |bc ` -eq 0 -o  ` echo " $DiffIn >= 0 " |bc ` -eq 0 ] ; then
-			$Echo  "Maybe 32 bit counter overflow, because we got a negative value here."
+                        #Retry
+                        sleep 15
+                        /usr/lib/icinga2/custom_plugins/check_traffic.sh "$@"
+                        if [ $? -eq 0 ]; then
+                        exit 0
+                        fi
+			$Echo  "Maybe 32 bit counter overflow, because we got a negative value here. Return "$?"."
 			exit 3
 		fi
 		
@@ -1555,10 +1322,11 @@ else
 				to_debug "$Time|$In|$Out"  $curCHD
 				continue
 			else
+                                #Delete File for clean retry
+                                rm $curCHD
 				Severity="3"
 				Msg="Unknown"
-				OutPut="Can not found data in the history data file. \
-				Please to check the file $curCHD, or use use verbose mode and check the debug file" 
+				OutPut="Can not find data in the history data file. The file $curCHD was deleted for a clean retry." 
 				$Echo "$Msg" "-" $OutPut
 				exit $Severity
 			fi
@@ -1606,12 +1374,24 @@ else
 		to_debug Interval/DiffIn/DiffOut $Interval $DiffIn $DiffOut 
 		
 		if [ ` echo " $Interval > 0 " |bc ` -eq 0 ] ; then
-			$Echo  "we got a negative time interval value here."
+                        #Retry
+                        sleep 15
+                        /usr/lib/icinga2/custom_plugins/check_traffic.sh "$@"
+                        if [ $? -eq 0 ]; then
+                        exit 0
+                        fi
+			$Echo  "we got a negative time interval value here. Return "$?"."
 			exit 3
 		fi
 		
 		if [ ` echo " $DiffOut >= 0 " |bc ` -eq 0 -o  ` echo " $DiffIn >= 0 " |bc ` -eq 0 ] ; then
-			$Echo  "Maybe 32 bit counter overflow, because we got a negative value here."
+                        #Retry
+                        sleep 15
+                        /usr/lib/icinga2/custom_plugins/check_traffic.sh "$@"
+                        if [ $? -eq 0 ]; then
+                        exit 0
+                        fi
+			$Echo  "Maybe 32 bit counter overflow, because we got a negative value here. Return "$?"."
 			exit 3
 		fi
 		
@@ -1926,7 +1706,8 @@ if [ $UseRange = "True" ] ;then
 	elif [ $Format"AA" = "sAA" ]; then
 		$Echo "$Msg" "-" In/Out/Total/Interval "$uIn"${Unit_1}${Unit_2}/"$uOut"${Unit_1}${Unit_2}/"$uTotal"${Unit_1}${Unit_2}/"$Interval"s \|In\=${uIn}${Unit_1}${Unit_2}\;\;\;0\;0 Out\=${uOut}${Unit_1}${Unit_2}\;\;\;0\;0 Total\=${uTotal}${Unit_1}${Unit_2}\;\;\;0\;0 Interval\=${Interval}s\;1200\;1800\;0\;0 
 	else
-		$Echo "$Msg" "-" The Traffic In is "$uIn"${Unit_1}${Unit_2}, Out is "$uOut"${Unit_1}${Unit_2}, Total is "$uTotal"${Unit_1}${Unit_2}. The Check Interval is "$Interval"s \|In\=${uIn}${Unit_1}${Unit_2}\;\;\;0\;0 Out\=${uOut}${Unit_1}${Unit_2}\;\;\;0\;0 Total\=${uTotal}${Unit_1}${Unit_2}\;\;\;0\;0 Interval\=${Interval}s\;1200\;1800\;0\;0 
+#Units explanations
+		$Echo "$Msg" "-" The Traffic In is "$uIn"${Unit_1}${Unit_2}, Out is "$uOut"${Unit_1}${Unit_2}, Total is "$uTotal"${Unit_1}${Unit_2}, Unit is KB=KBps, Kb=Kbps, MB=MBps, Mb=Mbps. The Check Interval is "$Interval"s \|In\=${uIn}${Unit_1}${Unit_2}\;\;\;0\;0 Out\=${uOut}${Unit_1}${Unit_2}\;\;\;0\;0 Total\=${uTotal}${Unit_1}${Unit_2}\;\;\;0\;0 Interval\=${Interval}s\;1200\;1800\;0\;0 
 	fi
 	exit $Severity
 
@@ -1948,7 +1729,8 @@ else
 	elif [ $Format"AA" = "sAA" ]; then
 		$Echo "$Msg" "-" In/Out/Total/Interval "$uIn"${Unit_1}${Unit_2}/"$uOut"${Unit_1}${Unit_2}/"$uTotal"${Unit_1}${Unit_2}/"$Interval"s \|In\=${uIn}${Unit_1}${Unit_2}\;${W1}\;${C1}\;0\;0 Out\=${uOut}${Unit_1}${Unit_2}\;${W2}\;${C2}\;0\;0 Total\=${uTotal}${Unit_1}${Unit_2}\;${Wt}\;${Ct}\;0\;0 Interval\=${Interval}s\;1200\;1800\;0\;0 
 	else
-		$Echo "$Msg" "-" The Traffic In is "$uIn"${Unit_1}${Unit_2}, Out is "$uOut"${Unit_1}${Unit_2}, Total is "$uTotal"${Unit_1}${Unit_2}. The Check Interval is "$Interval"s \|In\=${uIn}${Unit_1}${Unit_2}\;${W1}\;${C1}\;0\;0 Out\=${uOut}${Unit_1}${Unit_2}\;${W2}\;${C2}\;0\;0 Total\=${uTotal}${Unit_1}${Unit_2}\;${Wt}\;${Ct}\;0\;0 Interval\=${Interval}s\;1200\;1800\;0\;0 
+#Units explanations
+		$Echo "$Msg" "-" The Traffic In is "$uIn"${Unit_1}${Unit_2}, Out is "$uOut"${Unit_1}${Unit_2}, Total is "$uTotal"${Unit_1}${Unit_2}, Unit is KB=KBps, Kb=Kbps, MB=MBps, Mb=Mbps. The Check Interval is "$Interval"s \|In\=${uIn}${Unit_1}${Unit_2}\;${W1}\;${C1}\;0\;0 Out\=${uOut}${Unit_1}${Unit_2}\;${W2}\;${C2}\;0\;0 Total\=${uTotal}${Unit_1}${Unit_2}\;${Wt}\;${Ct}\;0\;0 Interval\=${Interval}s\;1200\;1800\;0\;0 
 	fi
 	exit $Severity
 fi

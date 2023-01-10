@@ -24,6 +24,10 @@
 #########################################################################
 # ChangeLog:
 #
+# Version 1.4.4
+# 2023-01-10
+# only use Last found interface
+#
 # Version 1.4.3
 # 2022-08-08
 # delete tmp file when unknown for clean retry.
@@ -167,10 +171,15 @@ get_interface_index(){
         intNameList=$(echo $intNames|sed 's/,/ /g')
         for intName in $intNameList
         do
-#Case insensitive search for first occurence of pattern, cut index
+# Case insensitive search for first occurence of pattern, cut index
+# Only keep last found device
 #               intIndex="$intIndex "$($SNMPWALK -v $Version $Community $Host "IF-MIB::ifDescr" |awk -F 'STRING: ' '{if ($2 == "'$intNameTemp'")print $0}' | awk -F '=' '{print $1}' | sed 's/IF-MIB::ifDescr.//')
-                intIndex="$intIndex "$($SNMPWALK -v $Version $Community $Host "IF-MIB::ifDescr" | grep -m 1 -iF $intName | cut -d "." -f 2 | cut -d "=" -f 1)
-        done
+#               intIndex="$intIndex "$($SNMPWALK -v $Version $Community $Host "IF-MIB::ifDescr" | grep -m 1 -iF $intName | cut -d "." -f 2 | cut -d "=" -f 1)
+                Return=$($SNMPWALK -v $Version $Community $Host "IF-MIB::ifDescr" | grep -m 1 -iF $intName | cut -d "." -f 2 | cut -d "=" -f 1)
+                if [ ! -z $Return ]; then
+                intIndex=$Return
+                fi
+	done
 }
 
 

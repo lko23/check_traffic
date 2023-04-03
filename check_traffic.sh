@@ -24,6 +24,10 @@
 #########################################################################
 # ChangeLog:
 #
+# Version 1.4.5
+# 2023-01-10
+# Retry once if old hist file
+#
 # Version 1.4.4
 # 2023-01-10
 # only use Last found interface
@@ -748,11 +752,15 @@ if [ $mmHostCnt -gt 1 ]; then
 			fi
 		
 			if [ $Interval -gt $Max_Interval ] ; then
+                        	# Retry
+                        	sleep 15
+                        	/usr/lib/icinga2/custom_plugins/check_traffic.sh "$@"
+                        	if [ $? -eq 0 ]; then
+                               		exit 0
+                        	fi
 				$Echo "The check interval is too large. It is greater than $Max_Interval. The result is dropped. We will use fresh data at the next check."
 				exit 3
 			fi
-		
-		
 		fi
 		
 		DiffIn=`echo "$In - $HistIn" | bc`
@@ -764,7 +772,7 @@ if [ $mmHostCnt -gt 1 ]; then
                         sleep 15
                         /usr/lib/icinga2/custom_plugins/check_traffic.sh "$@"
                         if [ $? -eq 0 ]; then
-			exit 0
+				exit 0
 			fi
 			$Echo  "we got a negative time interval value here. Return "$?"."
                         exit 3
@@ -773,9 +781,9 @@ if [ $mmHostCnt -gt 1 ]; then
 		if [ ` echo " $DiffOut >= 0 " |bc ` -eq 0 -o  ` echo " $DiffIn >= 0 " |bc ` -eq 0 ] ; then
                         #Retry
                         sleep 15
-                        /usr/lib/icinga2/custom_plugins/check_traffic.sh "$@"
+	                /usr/lib/icinga2/custom_plugins/check_traffic.sh "$@"
                         if [ $? -eq 0 ]; then
-                        exit 0
+	                        exit 0
                         fi
 			$Echo  "Maybe 32 bit counter overflow, because we got a negative value here. Return "$?"."
 			exit 3
@@ -1371,11 +1379,15 @@ else
 			fi
 	
 			if [ $Interval -gt $Max_Interval ] ; then
+	                        # Retry
+        	                sleep 15
+                	        /usr/lib/icinga2/custom_plugins/check_traffic.sh "$@"
+                        	if [ $? -eq 0 ]; then
+                               		exit 0
+                        	fi
 				$Echo "The check interval is too large(It is greater than $Max_Interval). The result is droped. We will use the fresh data at the next time."
 				exit 3
 			fi
-	
-	
 		fi
 	
 		DiffIn=`echo "$In - $HistIn" | bc`
@@ -1387,7 +1399,7 @@ else
                         sleep 15
                         /usr/lib/icinga2/custom_plugins/check_traffic.sh "$@"
                         if [ $? -eq 0 ]; then
-                        exit 0
+                        	exit 0
                         fi
 			$Echo  "we got a negative time interval value here. Return "$?"."
 			exit 3
@@ -1398,7 +1410,7 @@ else
                         sleep 15
                         /usr/lib/icinga2/custom_plugins/check_traffic.sh "$@"
                         if [ $? -eq 0 ]; then
-                        exit 0
+                        	exit 0
                         fi
 			$Echo  "Maybe 32 bit counter overflow, because we got a negative value here. Return "$?"."
 			exit 3

@@ -753,7 +753,7 @@ if [ $mmHostCnt -gt 1 ]; then
 		
 			if [ $Interval -gt $Max_Interval ] ; then
                         	# Retry
-                        	sleep 15
+                        	sleep 5
                         	/usr/lib/icinga2/custom_plugins/check_traffic.sh "$@"
                         	if [ $? -eq 0 ]; then
                                		exit 0
@@ -769,7 +769,7 @@ if [ $mmHostCnt -gt 1 ]; then
 		
 		if [ ` echo " $Interval > 0 " |bc ` -eq 0 ] ; then
                         #Retry
-                        sleep 15
+                        sleep 5
                         /usr/lib/icinga2/custom_plugins/check_traffic.sh "$@"
                         if [ $? -eq 0 ]; then
 				exit 0
@@ -780,7 +780,7 @@ if [ $mmHostCnt -gt 1 ]; then
 		
 		if [ ` echo " $DiffOut >= 0 " |bc ` -eq 0 -o  ` echo " $DiffIn >= 0 " |bc ` -eq 0 ] ; then
                         #Retry
-                        sleep 15
+                        sleep 5
 	                /usr/lib/icinga2/custom_plugins/check_traffic.sh "$@"
                         if [ $? -eq 0 ]; then
 	                        exit 0
@@ -1380,7 +1380,7 @@ else
 	
 			if [ $Interval -gt $Max_Interval ] ; then
 	                        # Retry
-        	                sleep 15
+        	                sleep 5
                 	        /usr/lib/icinga2/custom_plugins/check_traffic.sh "$@"
                         	if [ $? -eq 0 ]; then
                                		exit 0
@@ -1396,7 +1396,7 @@ else
 		
 		if [ ` echo " $Interval > 0 " |bc ` -eq 0 ] ; then
                         #Retry
-                        sleep 15
+                        sleep 5
                         /usr/lib/icinga2/custom_plugins/check_traffic.sh "$@"
                         if [ $? -eq 0 ]; then
                         	exit 0
@@ -1407,7 +1407,7 @@ else
 		
 		if [ ` echo " $DiffOut >= 0 " |bc ` -eq 0 -o  ` echo " $DiffIn >= 0 " |bc ` -eq 0 ] ; then
                         #Retry
-                        sleep 15
+                        sleep 5
                         /usr/lib/icinga2/custom_plugins/check_traffic.sh "$@"
                         if [ $? -eq 0 ]; then
                         	exit 0
